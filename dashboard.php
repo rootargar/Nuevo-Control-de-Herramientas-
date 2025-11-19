@@ -1,45 +1,89 @@
 <?php
 /**
  * Sistema de Control de Herramientas de Taller
- * Página Principal - Redirige al Dashboard o Login
+ * Dashboard Principal (Requiere Autenticación)
  */
 
 session_start();
+require_once 'conexion.php';
+require_once 'auth.php';
+require_once 'modulos/funciones.php';
 
-// Si está autenticado, redirigir al dashboard
-if (isset($_SESSION['usuario_id'])) {
-    header("Location: dashboard.php");
-    exit();
-} else {
-    // Si no está autenticado, redirigir al login
-    header("Location: login.php");
-    exit();
-}
+// Verificar autenticación
+verificarAutenticacion();
+
+// Obtener estadísticas del sistema
+$estadisticas = obtenerEstadisticas($conn);
+
+// Obtener el nombre del usuario
+$nombreUsuario = obtenerUsuarioNombre();
+$rolUsuario = obtenerUsuarioRol();
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Herramientas de Taller</title>
+    <title>Dashboard - Control de Herramientas</title>
     <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
     <header>
         <div class="header-content">
-            <h1>Sistema de Control de Herramientas de Taller</h1>
+            <h1>🔧 Sistema de Control de Herramientas de Taller</h1>
+            <div class="user-info">
+                <span>Bienvenido, <strong><?php echo htmlspecialchars($nombreUsuario); ?></strong></span>
+                <span class="badge badge-<?php echo $rolUsuario === 'Administrador' ? 'success' : ($rolUsuario === 'Supervisor' ? 'warning' : 'info'); ?>">
+                    <?php echo htmlspecialchars($rolUsuario); ?>
+                </span>
+                <a href="logout.php" class="btn btn-sm btn-danger">Cerrar Sesión</a>
+            </div>
         </div>
     </header>
 
     <nav>
         <ul>
-            <li><a href="index.php" class="active">Inicio</a></li>
+            <li><a href="dashboard.php" class="active">Dashboard</a></li>
+
+            <?php if (tienePermiso('herramientas', 'ver')): ?>
             <li><a href="modulos/herramientas.php">Herramientas</a></li>
+            <?php endif; ?>
+
+            <?php if (tienePermiso('tecnicos', 'ver')): ?>
             <li><a href="modulos/tecnicos.php">Técnicos</a></li>
+            <?php endif; ?>
+
+            <?php if (tienePermiso('prestamos', 'ver')): ?>
             <li><a href="modulos/prestamos.php">Préstamos</a></li>
+            <?php endif; ?>
+
+            <?php if (tienePermiso('cajas', 'ver')): ?>
             <li><a href="modulos/cajas.php">Cajas</a></li>
+            <?php endif; ?>
+
+            <?php if (tienePermiso('devoluciones', 'ver')): ?>
             <li><a href="modulos/devoluciones.php">Devoluciones</a></li>
+            <?php endif; ?>
+
+            <?php if (tienePermiso('reportes', 'ver')): ?>
             <li><a href="modulos/reportes.php">Reportes</a></li>
+            <?php endif; ?>
+
+            <?php if (esAdministrador()): ?>
+            <li class="dropdown">
+                <a href="#">Administración ▼</a>
+                <div class="dropdown-content">
+                    <a href="modulos/usuarios.php">Usuarios</a>
+                    <a href="modulos/ubicaciones.php">Ubicaciones</a>
+                    <a href="modulos/tipos_herramientas.php">Tipos de Herramientas</a>
+                    <a href="modulos/auditoria.php">Auditoría</a>
+                </div>
+            </li>
+            <?php endif; ?>
+
+            <?php if (esSupervisorOAdmin()): ?>
+            <li><a href="modulos/auditoria.php">Auditoría</a></li>
+            <?php endif; ?>
         </ul>
     </nav>
 
@@ -47,14 +91,14 @@ if (isset($_SESSION['usuario_id'])) {
         <?php mostrarMensajeSesion(); ?>
 
         <div class="welcome-section">
-            <h2>Bienvenido al Sistema de Control de Herramientas</h2>
+            <h2>Panel de Control - <?php echo htmlspecialchars($rolUsuario); ?></h2>
             <p>Gestiona eficientemente el inventario de herramientas, préstamos, cajas y técnicos de tu taller.</p>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <h2>Panel de Control</h2>
-                <p>Resumen del estado actual del sistema</p>
+                <h2>Resumen del Sistema</h2>
+                <p>Estado actual del inventario y operaciones</p>
             </div>
 
             <div class="stats-grid">
@@ -81,7 +125,7 @@ if (isset($_SESSION['usuario_id'])) {
 
             <?php if ($estadisticas['stock_bajo'] > 0 || $estadisticas['sin_stock'] > 0): ?>
             <div class="alert alert-warning">
-                <strong>Atención:</strong>
+                <strong>⚠ Atención:</strong>
                 <?php if ($estadisticas['sin_stock'] > 0): ?>
                     Hay <?php echo $estadisticas['sin_stock']; ?> herramienta(s) sin stock disponible.
                 <?php endif; ?>
@@ -99,11 +143,25 @@ if (isset($_SESSION['usuario_id'])) {
                         <h2>Accesos Rápidos</h2>
                     </div>
                     <div class="btn-group" style="flex-direction: column;">
+                        <?php if (tienePermiso('herramientas', 'crear')): ?>
                         <a href="modulos/herramientas.php?accion=nuevo" class="btn btn-primary">Nueva Herramienta</a>
+                        <?php endif; ?>
+
+                        <?php if (tienePermiso('tecnicos', 'crear')): ?>
                         <a href="modulos/tecnicos.php?accion=nuevo" class="btn btn-primary">Nuevo Técnico</a>
+                        <?php endif; ?>
+
+                        <?php if (tienePermiso('prestamos', 'crear')): ?>
                         <a href="modulos/prestamos.php?accion=nuevo" class="btn btn-success">Registrar Préstamo</a>
+                        <?php endif; ?>
+
+                        <?php if (tienePermiso('cajas', 'crear')): ?>
                         <a href="modulos/cajas.php?accion=nuevo" class="btn btn-success">Crear Caja</a>
+                        <?php endif; ?>
+
+                        <?php if (tienePermiso('devoluciones', 'crear')): ?>
                         <a href="modulos/devoluciones.php?accion=nuevo" class="btn btn-warning">Registrar Devolución</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -123,6 +181,7 @@ if (isset($_SESSION['usuario_id'])) {
             </div>
         </div>
 
+        <?php if (tienePermiso('prestamos', 'ver')): ?>
         <div class="card">
             <div class="card-header">
                 <h2>Últimos Préstamos Activos</h2>
@@ -183,6 +242,7 @@ if (isset($_SESSION['usuario_id'])) {
                 </table>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 
     <footer>

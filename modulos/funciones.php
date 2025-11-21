@@ -224,45 +224,76 @@ function mostrarMensajeSesion() {
  * Obtener estadísticas del sistema
  */
 function obtenerEstadisticas($conn) {
-    $estadisticas = array();
+    $estadisticas = array(
+        'total_herramientas' => 0,
+        'total_tecnicos' => 0,
+        'prestamos_activos' => 0,
+        'cajas_activas' => 0,
+        'stock_bajo' => 0,
+        'sin_stock' => 0
+    );
 
     // Total de herramientas
     $sql = "SELECT COUNT(*) as total FROM Herramientas WHERE Estado = 'Activa'";
     $stmt = sqlsrv_query($conn, $sql);
-    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-    $estadisticas['total_herramientas'] = $row['total'];
+    if ($stmt !== false) {
+        $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        if ($row) {
+            $estadisticas['total_herramientas'] = $row['total'];
+        }
+    }
 
     // Total de técnicos activos
     $sql = "SELECT COUNT(*) as total FROM Tecnicos WHERE Estado = 'Activo'";
     $stmt = sqlsrv_query($conn, $sql);
-    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-    $estadisticas['total_tecnicos'] = $row['total'];
+    if ($stmt !== false) {
+        $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        if ($row) {
+            $estadisticas['total_tecnicos'] = $row['total'];
+        }
+    }
 
     // Préstamos activos
     $sql = "SELECT COUNT(*) as total FROM Prestamos WHERE EstadoPrestamo = 'Activo'";
     $stmt = sqlsrv_query($conn, $sql);
-    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-    $estadisticas['prestamos_activos'] = $row['total'];
+    if ($stmt !== false) {
+        $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        if ($row) {
+            $estadisticas['prestamos_activos'] = $row['total'];
+        }
+    }
 
     // Cajas activas
     $sql = "SELECT COUNT(*) as total FROM Cajas WHERE Estado = 'Activa'";
     $stmt = sqlsrv_query($conn, $sql);
-    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-    $estadisticas['cajas_activas'] = $row['total'];
+    if ($stmt !== false) {
+        $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        if ($row) {
+            $estadisticas['cajas_activas'] = $row['total'];
+        }
+    }
 
     // Herramientas con stock bajo (menos de 5)
     $sql = "SELECT COUNT(*) as total FROM Herramientas
             WHERE Estado = 'Activa' AND ExistenciaDisponible < 5";
     $stmt = sqlsrv_query($conn, $sql);
-    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-    $estadisticas['stock_bajo'] = $row['total'];
+    if ($stmt !== false) {
+        $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        if ($row) {
+            $estadisticas['stock_bajo'] = $row['total'];
+        }
+    }
 
     // Herramientas sin stock
     $sql = "SELECT COUNT(*) as total FROM Herramientas
             WHERE Estado = 'Activa' AND ExistenciaDisponible = 0";
     $stmt = sqlsrv_query($conn, $sql);
-    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-    $estadisticas['sin_stock'] = $row['total'];
+    if ($stmt !== false) {
+        $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        if ($row) {
+            $estadisticas['sin_stock'] = $row['total'];
+        }
+    }
 
     return $estadisticas;
 }

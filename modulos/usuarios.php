@@ -35,12 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensaje = 'El nombre de usuario ya existe';
             $tipoMensaje = 'error';
         } else {
-            $contrasenaHash = md5($contrasena);
-
+            // Contraseña en texto plano (entorno local)
             $sql = "INSERT INTO Usuarios (NombreUsuario, Contrasena, NombreCompleto, Email, Rol, Estado)
                     VALUES (?, ?, ?, ?, ?, ?)";
 
-            $params = array($nombreUsuario, $contrasenaHash, $nombreCompleto, $email, $rol, $estado);
+            $params = array($nombreUsuario, $contrasena, $nombreCompleto, $email, $rol, $estado);
             $stmt = sqlsrv_query($conn, $sql, $params);
 
             if ($stmt) {
@@ -70,12 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cambiarContrasena = isset($_POST['cambiar_contrasena']) && $_POST['cambiar_contrasena'] === '1';
 
         if ($cambiarContrasena && !empty($_POST['contrasena'])) {
-            $contrasenaHash = md5($_POST['contrasena']);
+            // Contraseña en texto plano (entorno local)
             $sql = "UPDATE Usuarios
                     SET NombreUsuario = ?, Contrasena = ?, NombreCompleto = ?, Email = ?, Rol = ?, Estado = ?,
                         FechaActualizacion = GETDATE()
                     WHERE IdUsuario = ?";
-            $params = array($nombreUsuario, $contrasenaHash, $nombreCompleto, $email, $rol, $estado, $idUsuario);
+            $params = array($nombreUsuario, $_POST['contrasena'], $nombreCompleto, $email, $rol, $estado, $idUsuario);
         } else {
             $sql = "UPDATE Usuarios
                     SET NombreUsuario = ?, NombreCompleto = ?, Email = ?, Rol = ?, Estado = ?,

@@ -25,15 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($nombreUsuario) || empty($contrasena)) {
         $error = 'Por favor ingrese usuario y contraseña';
     } else {
-        // Hashear la contraseña con MD5
-        $contrasenaHash = md5($contrasena);
-
-        // Buscar el usuario en la base de datos
+        // Buscar el usuario en la base de datos (contraseña en texto plano)
         $sql = "SELECT IdUsuario, NombreUsuario, NombreCompleto, Email, Rol, Estado
                 FROM Usuarios
                 WHERE NombreUsuario = ? AND Contrasena = ? AND Estado = 'Activo'";
 
-        $params = array($nombreUsuario, $contrasenaHash);
+        $params = array($nombreUsuario, $contrasena);
         $stmt = sqlsrv_query($conn, $sql, $params);
 
         if ($stmt === false) {

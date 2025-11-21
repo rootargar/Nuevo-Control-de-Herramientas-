@@ -317,31 +317,31 @@ PRINT 'Insertando datos iniciales...';
 GO
 
 -- Insertar usuario Administrador por defecto (password: admin123)
--- Hash MD5 de 'admin123' = 0192023a7bbd73250516f069df18b500
+-- NOTA: Contraseñas en texto plano para entorno local
 IF NOT EXISTS (SELECT * FROM Usuarios WHERE NombreUsuario = 'admin')
 BEGIN
     INSERT INTO Usuarios (NombreUsuario, Contrasena, NombreCompleto, Email, Rol, Estado)
-    VALUES ('admin', '0192023a7bbd73250516f069df18b500', 'Administrador del Sistema', 'admin@taller.com', 'Administrador', 'Activo');
+    VALUES ('admin', 'admin123', 'Administrador del Sistema', 'admin@taller.com', 'Administrador', 'Activo');
     PRINT 'Usuario Administrador creado (usuario: admin, password: admin123)';
 END
 GO
 
 -- Insertar usuario Supervisor por defecto (password: supervisor123)
--- Hash MD5 de 'supervisor123' = 6ccb4b7c39bcef55ef87c9f4c1537fc6
+-- NOTA: Contraseñas en texto plano para entorno local
 IF NOT EXISTS (SELECT * FROM Usuarios WHERE NombreUsuario = 'supervisor')
 BEGIN
     INSERT INTO Usuarios (NombreUsuario, Contrasena, NombreCompleto, Email, Rol, Estado)
-    VALUES ('supervisor', '6ccb4b7c39bcef55ef87c9f4c1537fc6', 'Supervisor del Taller', 'supervisor@taller.com', 'Supervisor', 'Activo');
+    VALUES ('supervisor', 'supervisor123', 'Supervisor del Taller', 'supervisor@taller.com', 'Supervisor', 'Activo');
     PRINT 'Usuario Supervisor creado (usuario: supervisor, password: supervisor123)';
 END
 GO
 
 -- Insertar usuario Técnico por defecto (password: tecnico123)
--- Hash MD5 de 'tecnico123' = 7ca5d7ac2f0edb4dbe8e93a82f7e4a5d
+-- NOTA: Contraseñas en texto plano para entorno local
 IF NOT EXISTS (SELECT * FROM Usuarios WHERE NombreUsuario = 'tecnico')
 BEGIN
     INSERT INTO Usuarios (NombreUsuario, Contrasena, NombreCompleto, Email, Rol, Estado)
-    VALUES ('tecnico', '7ca5d7ac2f0edb4dbe8e93a82f7e4a5d', 'Técnico de Prueba', 'tecnico@taller.com', 'Tecnico', 'Activo');
+    VALUES ('tecnico', 'tecnico123', 'Técnico de Prueba', 'tecnico@taller.com', 'Tecnico', 'Activo');
     PRINT 'Usuario Técnico creado (usuario: tecnico, password: tecnico123)';
 END
 GO
